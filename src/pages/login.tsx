@@ -1,13 +1,17 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { gql, useMutation } from "@apollo/client";
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { FormError } from "../components/form-error";
-import { loginMutation, loginMutationVariables } from "../__generated__/loginMutation";
+import {
+  loginMutation,
+  loginMutationVariables,
+} from "../__generated__/loginMutation";
 
 const LOGIN_MUTATION = gql`
-  mutation loginMutation($email: String!, $password: String!) {
-    login(input: { email: $email, password: $password }) {
+  mutation loginMutation($loginInput: LoginInput!) {
+    login(input: $loginInput) {
       ok
       token
       error
@@ -28,19 +32,30 @@ const LoginPage = () => {
     formState: { errors },
     handleSubmit,
   } = useForm<ILoginForm>();
-  const [loginMutation, { data }] = useMutation<
+  const onCompleted = (data: loginMutation) => {
+    const {
+      login: { error, ok, token },
+    } = data;
+    if (ok) {
+      console.log(token);
+    }
+  };
+  const [loginMutation, { data: loginMutationResult, loading }] = useMutation<
     loginMutation,
     loginMutationVariables
-  >(LOGIN_MUTATION);
+  >(LOGIN_MUTATION, { onCompleted });
   const onSubmit = (data: any) => {
-    console.log(data);
-    const { email, password } = getValues();
-    loginMutation({
-      variables: {
-        email,
-        password,
-      },
-    });
+    if (!loading) {
+      const { email, password } = getValues();
+      loginMutation({
+        variables: {
+          loginInput: {
+            email,
+            password,
+          },
+        },
+      });
+    }
   };
   const [redBorder, setRedBorder] = useState(false);
 
@@ -101,8 +116,11 @@ const LoginPage = () => {
             <FormError errorMessage={"비밀번호는 10글자 이상이여야 합니다."} />
           )}
           <button className="py-3 px-3 bg-gray-800 text-white rounded-md hover:opacity-80">
-            로그인
+            {loading ? "loading.." : "로그인"}
           </button>
+          {loginMutationResult?.login.error && (
+            <FormError errorMessage={loginMutationResult.login.error} />
+          )}
         </form>
       </div>
     </div>
