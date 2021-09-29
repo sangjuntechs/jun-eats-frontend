@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { Link, useHistory } from "react-router-dom";
 import { Button } from "../components/button";
 import { FormError } from "../components/form-error";
-import Helmet from "react-helmet";
+import { Helmet } from "react-helmet-async";
 import { UserRole } from "../__generated__/globalTypes";
 import {
   createAccountMutation,
@@ -48,6 +48,7 @@ const CreateAccount = () => {
       createAccount: { ok },
     } = data;
     if (ok) {
+      alert("회원가입이 되었습니다! 로그인 화면으로 돌아갑니다.")
       History.push("/login");
     }
   };
