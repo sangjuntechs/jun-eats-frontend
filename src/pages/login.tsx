@@ -3,6 +3,8 @@
 import { gql, useMutation } from "@apollo/client";
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { Link } from "react-router-dom";
+import { Button } from "../components/button";
 import { FormError } from "../components/form-error";
 import {
   loginMutation,
@@ -29,9 +31,11 @@ const LoginPage = () => {
     register,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     getValues,
-    formState: { errors },
+    formState: { errors, isValid },
     handleSubmit,
-  } = useForm<ILoginForm>();
+  } = useForm<ILoginForm>({
+    mode:'onChange'
+  });
   const onCompleted = (data: loginMutation) => {
     const {
       login: { error, ok, token },
@@ -60,11 +64,7 @@ const LoginPage = () => {
   const [redBorder, setRedBorder] = useState(false);
 
   useEffect(() => {
-    if (
-      errors.password?.type === "minLength" ||
-      errors.password?.message ||
-      errors.email?.message
-    ) {
+    if (!isValid) {
       setRedBorder(true);
     } else {
       setRedBorder(false);
@@ -72,24 +72,30 @@ const LoginPage = () => {
   });
 
   return (
-    <div className="h-screen flex items-center justify-center bg-gray-800">
-      <div className="bg-white w-full max-w-lg py-20 pb-24 rounded-lg text-center">
-        <h3 className="text-2xl text-gray-800">로그인</h3>
+    <div className="h-screen flex items-center flex-col mt-10 lg:mt-28">
+      <div className="w-full max-w-screen-sm flex flex-col items-center px-5">
+        <div className="flex flex-row mb-10">
+          <p className="text-4xl">Jun</p>{" "}
+          <p className="text-4xl ml-1 text-indigo-600 font-bold">Eats</p>
+        </div>
+        <h4 className="w-full text-2xl mb-5 font-medium">
+          Welcome back Jun Eats!
+        </h4>
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="grid gap-4 mt-5 px-10"
+          className="grid gap-4 mt-5 w-full"
         >
           <input
             {...register("email", { required: "필수 항목입니다." })}
             name="email"
             required
             type="email"
-            placeholder="Email"
-            className={`bg-gray-100 shadow-inner py-3 px-3 rounded-lg focus:outline-none border-2 ${
+            placeholder="이메일"
+            className={`p-3 border-2 text-lg font-light border-gray-300 transition-colors ${
               redBorder
                 ? "focus:border-red-600 focus:outline-none border-2"
                 : "focus:outline-none border-2 focus:border-green-500 focus:border-opacity-50 "
-            }`}
+            } `}
           />
           {errors.email?.message && (
             <FormError errorMessage={errors.email?.message} />
@@ -102,8 +108,8 @@ const LoginPage = () => {
             name="password"
             required
             type="password"
-            placeholder="Password"
-            className={`bg-gray-100 shadow-inner py-3 px-3 rounded-lg ${
+            placeholder="비밀번호"
+            className={`p-3 border-2 text-lg font-light border-gray-300 transition-colors ${
               redBorder
                 ? "focus:border-red-600 focus:outline-none border-2"
                 : "focus:outline-none border-2 focus:border-green-500 focus:border-opacity-50 "
@@ -115,13 +121,12 @@ const LoginPage = () => {
           {errors.password?.type === "minLength" && (
             <FormError errorMessage={"비밀번호는 10글자 이상이여야 합니다."} />
           )}
-          <button className="py-3 px-3 bg-gray-800 text-white rounded-md hover:opacity-80">
-            {loading ? "loading.." : "로그인"}
-          </button>
+          <Button canClick={isValid} loading={loading} actionText={'다음으로'}/>
           {loginMutationResult?.login.error && (
             <FormError errorMessage={loginMutationResult.login.error} />
           )}
         </form>
+        <div className="text-gray-700 text-sm mt-5">계정이 없으신가요? <Link to='/create-account' className="text-indigo-600 hover:underline"> 여기를 클릭하세요!</Link></div>
       </div>
     </div>
   );
