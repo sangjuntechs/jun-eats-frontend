@@ -49,7 +49,7 @@ const CreateAccount = () => {
     } = data;
     if (ok) {
       alert("회원가입이 되었습니다! 로그인 화면으로 돌아갑니다.")
-      History.push("/login");
+      History.push("/");
     }
   };
 
@@ -139,6 +139,7 @@ const CreateAccount = () => {
           {errors.password?.type === "minLength" && (
             <FormError errorMessage={"비밀번호는 10글자 이상이여야 합니다."} />
           )}
+          <p className="transform translate-y-3 text-sm">어떠한 역할로 가입하십니까?</p>
           <select
             {...register("role", { required: true })}
             className="p-3 border-2 text-lg font-light border-gray-300 transition-colors focus:border-gray-500 focus:outline-none"
@@ -161,7 +162,7 @@ const CreateAccount = () => {
         </form>
         <div className="text-gray-700 text-sm mt-5">
           이미 계정이 있으신가요?{" "}
-          <Link to="/login" className="text-indigo-600 hover:underline">
+          <Link to="/" className="text-indigo-600 hover:underline">
             {" "}
             지금 로그인 하세요!
           </Link>
