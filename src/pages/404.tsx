@@ -4,7 +4,7 @@ import { Helmet } from "react-helmet-async";
 
 const NotFound = () => {
   return (
-    <div className="h-screen flex items-center justify-center flex-col">
+    <div className="position absolute top-0 bg-white h-screen flex items-center justify-center flex-col w-screen z-10">
       <Helmet>
           <title>404 not found : Jun Eats</title>
       </Helmet>

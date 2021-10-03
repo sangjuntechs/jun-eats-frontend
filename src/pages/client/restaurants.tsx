@@ -2,7 +2,7 @@ import React from 'react'
 
 const Restaurants = () => {
     return (
-        <h1>client restaurants</h1>
+        <h1>client screen restaurants</h1>
     )
 }
 

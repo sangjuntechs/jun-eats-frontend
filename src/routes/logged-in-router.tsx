@@ -1,31 +1,20 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { gql, useQuery } from "@apollo/client";
 import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { isLoggedInVar } from "../apollo";
 import Header from "../components/header";
 import { LOCALSTORAGE_TOKEN } from "../constants";
+import { useMe } from "../hooks/useMe";
+import NotFound from "../pages/404";
 import Restaurants from "../pages/client/restaurants";
-import { meQuery } from "../__generated__/meQuery";
 
-const ClientRoutes = () => 
+const ClientRoutes = () => (
   <>
     <Route path="/" exact>
       <Restaurants />
     </Route>
-  </>;
-;
-
-const ME_QUERY = gql`
-  query meQuery {
-    me {
-      id
-      email
-      role
-      verified
-    }
-  }
-`;
+  </>
+);
 
 export const LoggedInRouter = () => {
   const onClick = () => {
@@ -33,7 +22,7 @@ export const LoggedInRouter = () => {
     localStorage.setItem(LOCALSTORAGE_TOKEN, "");
   };
 
-  const { data, loading, error } = useQuery<meQuery>(ME_QUERY);
+  const { data, loading, error } = useMe();
   if (!data || loading || error) {
     return (
       <div className="h-screen flex justify-center items-center">
@@ -44,11 +33,18 @@ export const LoggedInRouter = () => {
 
   return (
     <>
-    <Router>
-      <Header />
-      <Switch>{data.me.role === "Client" && <ClientRoutes />}</Switch>
-    </Router>
-    <button onClick={onClick}>logout</button>
+      <Router>
+        <Header email={data.me.email} />
+        <Switch>
+          <Route path="/" exact>
+          {data.me.role === "Client" && <ClientRoutes />}
+          </Route>
+          <Route>
+            <NotFound />
+          </Route>
+        </Switch>
+      </Router>
+      <button onClick={onClick}>logout</button>
     </>
   );
 };

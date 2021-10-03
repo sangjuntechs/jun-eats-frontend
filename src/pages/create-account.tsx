@@ -81,7 +81,7 @@ const CreateAccount = () => {
   });
 
   return (
-    <div className="h-screen flex items-center flex-col mt-10 lg:mt-28">
+    <div className="h-screen flex items-center flex-col mt-16 lg:mt-28">
       <Helmet>
         <title>회원가입 : Jun Eats</title>
       </Helmet>

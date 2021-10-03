@@ -78,7 +78,7 @@ const LoginPage = () => {
   });
 
   return (
-    <div className="h-screen flex items-center flex-col mt-10 lg:mt-28">
+    <div className="h-screen flex items-center flex-col mt-16 lg:mt-28">
       <Helmet>
         <title>로그인 : Jun Eats</title>
       </Helmet>
