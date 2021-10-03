@@ -3,6 +3,7 @@ import { gql, useQuery } from "@apollo/client";
 import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { isLoggedInVar } from "../apollo";
+import Header from "../components/header";
 import { LOCALSTORAGE_TOKEN } from "../constants";
 import Restaurants from "../pages/client/restaurants";
 import { meQuery } from "../__generated__/meQuery";
@@ -44,6 +45,7 @@ export const LoggedInRouter = () => {
   return (
     <>
     <Router>
+      <Header />
       <Switch>{data.me.role === "Client" && <ClientRoutes />}</Switch>
     </Router>
     <button onClick={onClick}>logout</button>
