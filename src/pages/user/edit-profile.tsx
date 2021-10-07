@@ -1,6 +1,7 @@
 /* eslint-disable no-useless-escape */
 import { gql, useApolloClient, useMutation } from "@apollo/client";
 import React, { useState } from "react";
+import { Helmet } from "react-helmet-async";
 import { useForm } from "react-hook-form";
 import { useHistory } from "react-router-dom";
 import { Button } from "../../components/button";
@@ -94,10 +95,16 @@ const EditProfile = () => {
   };
 
   return (
-    <div className="flex justify-center items-center flex-col mt-52">
+    <div className="flex justify-center items-center flex-col mt-16 md:mt-44">
+      <Helmet>
+          <title>유저 정보 변경 : Jun Eats</title>
+      </Helmet>
       <h1 className="font-medium text-2xl mb-5">유저 정보 수정</h1>
-      <p className="text-sm text-gray-500 mb-3">
-        이메일 정보를 바꿀경우 메일을 재인증 해야합니다.
+      <p className="text-sm text-gray-500">
+        이메일 정보를 바꾸는 경우 메일을 재인증 해야합니다. 
+      </p>
+      <p className="text-sm text-gray-500 mb-3 px-3 md:p-0">
+        비밀번호만 바꾸는 경우에는 메일인증을 다시 하지 않아도 됩니다.
       </p>
       <form
         className="grid gap-3 max-w-screen-sm w-screen p-3"

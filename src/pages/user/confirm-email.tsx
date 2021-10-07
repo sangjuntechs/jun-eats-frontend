@@ -8,6 +8,7 @@ import {
 } from "../../__generated__/verifyEmail";
 import { useMe } from "../../hooks/useMe";
 import { useHistory } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 
 const VERIFY_EMAIL_MUTATION = gql`
   mutation verifyEmail($input: VerifyEmailInput!) {
@@ -62,6 +63,7 @@ const ConfirmEmail = () => {
 
   return (
     <div className="flex items-center h-screen justify-center flex-col absolute w-screen top-0 bg-white">
+      <Helmet><title>이메일 인증 : Jun Eats</title></Helmet>
       <h1 className="text-xl font-medium mb-3 text-indigo-600">
         이메일을 인증하고 있습니다.
       </h1>

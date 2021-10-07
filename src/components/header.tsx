@@ -34,8 +34,8 @@ const Header: React.FC<IHeaderUser> = ({ email }) => {
         <div className="w-full mx-auto max-w-screen-xl flex justify-between items-center px-6 2xl:px-0">
           <Link to='/'>
           <div className="flex flex-row">
-            <p className="text-3xl">Jun</p>
-            <p className="text-3xl ml-1 text-indigo-600 font-bold">Eats</p>
+            <p className="text-lg md:text-3xl">Jun</p>
+            <p className="text-lg md:text-3xl ml-1 text-indigo-600 font-bold">Eats</p>
           </div>
           </Link>
           <div className="flex justify-center items-center">
