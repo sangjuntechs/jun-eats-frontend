@@ -11,9 +11,12 @@ import SushiImg from "/Users/sangjun/Documents/jun-eats-frontend/src/img/549sush
 import PastaImg from "/Users/sangjun/Documents/jun-eats-frontend/src/img/72_85243.png";
 import KoreanImg from "/Users/sangjun/Documents/jun-eats-frontend/src/img/3377053-bibimbub-cooking-food-japan_107429.png";
 import CoffeeImg from "/Users/sangjun/Documents/jun-eats-frontend/src/img/1455739604_Kitchen_Bold_Line_Color_Mix-18_icon-icons.com_53420.png";
-import SoupImg from '/Users/sangjun/Documents/jun-eats-frontend/src/img/spicy_shrimp_soup_food_icon_124102.png';
-import NightImg from '/Users/sangjun/Documents/jun-eats-frontend/src/img/640crescentmoon_100402.png';
+import SoupImg from "/Users/sangjun/Documents/jun-eats-frontend/src/img/spicy_shrimp_soup_food_icon_124102.png";
+import NightImg from "/Users/sangjun/Documents/jun-eats-frontend/src/img/640crescentmoon_100402.png";
 import RestaurantsComp from "../../components/restaurants";
+import { useForm } from "react-hook-form";
+import { useHistory } from "react-router-dom";
+import { RESTAURANT_FRAGMENT } from "../../fragments";
 
 const RESTAURANT_QUERY = gql`
   query restaurantsPageQuery($input: RestaurantsInput!) {
@@ -34,18 +37,16 @@ const RESTAURANT_QUERY = gql`
       totalPages
       totalResults
       results {
-        id
-        name
-        coverImage
-        category {
-          name
-        }
-        address
-        isPromoted
+        ...RestaurantsPart
       }
     }
   }
+  ${RESTAURANT_FRAGMENT}
 `;
+
+interface IPropsSearch {
+  searchTerm: string;
+}
 
 const Restaurants = () => {
   const [page, setPage] = useState(1);
@@ -68,34 +69,55 @@ const Restaurants = () => {
     setPage(page - 1);
   };
 
+  const history = useHistory();
+
+  const { register, handleSubmit, getValues } = useForm<IPropsSearch>();
+
+  const onSearchSubmit = () => {
+    const { searchTerm } = getValues();
+    history.push({
+      pathname:'/search',
+      search: `?term=${searchTerm}`
+    })
+  };
+
   return (
     <div>
       <Helmet>
         <title>Jun Eats</title>
       </Helmet>
-      <form className="w-full bg-gray-700 py-40 flex items-center justify-around">
+      <form
+        onSubmit={handleSubmit(onSearchSubmit)}
+        className="w-full bg-gray-700 py-20 flex flex-col items-center justify-around md:py-40 md:flex-row"
+      >
         <div className="flex flex-col justify-center items-center">
-          <p className="text-3xl text-white mb-3 font-bold tracking-wide">
+          <p className="md:text-3xl text-base font-normal text-white mb-3 md:font-bold tracking-wide">
             우리 뭐 먹을까? 금방 와!
           </p>
-          <p className="text-white text-sm">
+          <p className="text-white md:text-sm text-xs">
             주저하지 말고 Jun Eats에서 시키자!
           </p>
         </div>
         <input
-          className="p-5 text-lg border-2 font-medium transition-colors w-3/12 rounded-xl text-white bg-gray-800 focus:border-indigo-600 focus:outline-none"
+          {...register("searchTerm", {
+            required: true,
+          })}
+          className="md:p-5 md:text-lg border-2 md:font-medium transition-colors md:w-3/12 rounded-xl text-white bg-gray-800 focus:border-indigo-600 focus:outline-none p-3 md:mt-0 mt-5 text-sm"
           type="search"
           placeholder="음식점을 검색해보세요!"
         />
       </form>
       {!loading && (
         <div className="flex justify-around items-center mt-12 flex-col max-w-screen-3xl mx-auto w-full">
-          <div className="flex flex-wrap">
-            {data?.allCategories.categories?.slice(0,8).map((category) => {
+          <div className="flex flex-wrap justify-center items-center">
+            {data?.allCategories.categories?.slice(0, 8).map((category) => {
               return (
-                <div className="flex justify-between items-center mx-5 flex-col">
+                <div
+                  key={category.id}
+                  className="flex justify-center items-center mx-5 my-2 flex-col"
+                >
                   <img
-                    className="w-20 h-20 bg-cover rounded-full bg-indigo-400 transition-colors hover:bg-indigo-500 cursor-pointer"
+                    className="p-1 w-16 h-16 md:w-24 md:p-2 md:h-24 bg-cover rounded-full bg-indigo-400 transition-colors hover:bg-indigo-500 cursor-pointer"
                     src={
                       category.slug === "패스트푸드"
                         ? `${BurgerImg}`
@@ -109,9 +131,9 @@ const Restaurants = () => {
                         ? `${KoreanImg}`
                         : category.slug === "커피/디저트"
                         ? `${CoffeeImg}`
-                        : category.slug === '찜/탕'
+                        : category.slug === "찜/탕"
                         ? `${SoupImg}`
-                        : category.slug === '야식'
+                        : category.slug === "야식"
                         ? `${NightImg}`
                         : ""
                     }
@@ -122,10 +144,11 @@ const Restaurants = () => {
               );
             })}
           </div>
-          <div className="grid grid-cols-3 gap-x-2 gap-y-10 w-10/12 mt-20">
+          <div className="grid xl:grid-cols-3 sm:gap-x-2 md:gap-y-10 md:w-10/12 mt-20 grid-cols-1 gap-y-7 w-11/12 sm:grid-cols-2">
             {data?.restaurants.results?.map((restaurant) => {
               return (
                 <RestaurantsComp
+                  key={restaurant.id}
                   id={restaurant.id + ""}
                   coverImage={restaurant.coverImage}
                   name={restaurant.name}
@@ -136,8 +159,11 @@ const Restaurants = () => {
             })}
           </div>
           <div className="py-16 flex justify-center items-center">
-          {page > 1 && (
-              <button onClick={onPrevPageClick} className="text-2xl transition-colors hover:text-indigo-600">
+            {page > 1 && (
+              <button
+                onClick={onPrevPageClick}
+                className="text-2xl transition-colors hover:text-indigo-600"
+              >
                 &larr;
               </button>
             )}
@@ -145,7 +171,10 @@ const Restaurants = () => {
               Pages {page} of {data?.restaurants.totalPages}
             </span>
             {page !== data?.restaurants.totalPages && (
-              <button onClick={onNextPageClick} className="text-2xl transition-colors hover:text-indigo-600">
+              <button
+                onClick={onNextPageClick}
+                className="text-2xl transition-colors hover:text-indigo-600"
+              >
                 &rarr;
               </button>
             )}
