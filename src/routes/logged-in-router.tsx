@@ -8,6 +8,7 @@ import Category from "../pages/client/category";
 import Restaurants from "../pages/client/restaurants";
 import Search from "../pages/client/search";
 import EditProfileError from "../pages/editProfile-error";
+import RestaurantDetail from "../pages/client/restaurantDetail";
 import ConfirmEmail from "../pages/user/confirm-email";
 import EditProfile from "../pages/user/edit-profile";
 import VerifyError from "../pages/verify-error";
@@ -28,12 +29,16 @@ const ClientRoutes = [
   <Route key={5} path="/editprofile-error" exact>
     <EditProfileError />
   </Route>,
-  <Route key={6} path='/search' exact>
+  <Route key={6} path="/search" exact>
     <Search />
   </Route>,
-  <Route key={7} path='/category/:slug' exact>
+  <Route key={7} path="/category/:slug" exact>
     <Category />
-  </Route>
+  </Route>,
+
+  <Route key={8} path="/restaurants/:id" exact>
+    <RestaurantDetail />
+  </Route>,
 ];
 
 export const LoggedInRouter = () => {

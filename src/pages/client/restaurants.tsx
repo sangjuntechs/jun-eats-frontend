@@ -157,7 +157,7 @@ const Restaurants = () => {
               );
             })}
           </div>
-          <div className="grid grid-rows-1 grid-cols-3 py-16 items-center justify-center">
+          <div className="grid grid-rows-1 grid-cols-3 py-16 text-justify items-center justify-center">
             {page > 1 ? (
               <button
                 onClick={onPrevPageClick}
