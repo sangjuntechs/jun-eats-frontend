@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import Header from "../components/header";
 import { useMe } from "../hooks/useMe";
 import NotFound from "../pages/404";
+import Category from "../pages/client/category";
 import Restaurants from "../pages/client/restaurants";
 import Search from "../pages/client/search";
 import EditProfileError from "../pages/editProfile-error";
@@ -29,6 +30,9 @@ const ClientRoutes = [
   </Route>,
   <Route key={6} path='/search' exact>
     <Search />
+  </Route>,
+  <Route key={7} path='/category/:slug' exact>
+    <Category />
   </Route>
 ];
 

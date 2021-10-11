@@ -15,8 +15,8 @@ import SoupImg from "/Users/sangjun/Documents/jun-eats-frontend/src/img/spicy_sh
 import NightImg from "/Users/sangjun/Documents/jun-eats-frontend/src/img/640crescentmoon_100402.png";
 import RestaurantsComp from "../../components/restaurants";
 import { useForm } from "react-hook-form";
-import { useHistory } from "react-router-dom";
-import { RESTAURANT_FRAGMENT } from "../../fragments";
+import { Link, useHistory } from "react-router-dom";
+import { CATEGORY_FRAGMENT, RESTAURANT_FRAGMENT } from "../../fragments";
 
 const RESTAURANT_QUERY = gql`
   query restaurantsPageQuery($input: RestaurantsInput!) {
@@ -24,11 +24,7 @@ const RESTAURANT_QUERY = gql`
       ok
       error
       categories {
-        id
-        name
-        coverImage
-        slug
-        restaurantCount
+        ...CategorysPart
       }
     }
     restaurants(input: $input) {
@@ -42,6 +38,7 @@ const RESTAURANT_QUERY = gql`
     }
   }
   ${RESTAURANT_FRAGMENT}
+  ${CATEGORY_FRAGMENT}
 `;
 
 interface IPropsSearch {
@@ -112,6 +109,7 @@ const Restaurants = () => {
           <div className="flex flex-wrap justify-center items-center">
             {data?.allCategories.categories?.slice(0, 8).map((category) => {
               return (
+                <Link key={category.id} to={`/category/${category.slug}`}>
                 <div
                   key={category.id}
                   className="flex justify-center items-center mx-5 my-2 flex-col"
@@ -129,9 +127,9 @@ const Restaurants = () => {
                         ? `${PastaImg}`
                         : category.slug === "한식"
                         ? `${KoreanImg}`
-                        : category.slug === "커피/디저트"
+                        : category.slug === "커피,디저트"
                         ? `${CoffeeImg}`
-                        : category.slug === "찜/탕"
+                        : category.slug === "찜,탕"
                         ? `${SoupImg}`
                         : category.slug === "야식"
                         ? `${NightImg}`
@@ -141,6 +139,7 @@ const Restaurants = () => {
                   />
                   <p className="text-sm mt-2 font-semibold">{category.name}</p>
                 </div>
+                </Link>
               );
             })}
           </div>
@@ -158,26 +157,26 @@ const Restaurants = () => {
               );
             })}
           </div>
-          <div className="py-16 flex justify-center items-center">
-            {page > 1 && (
+          <div className="grid grid-rows-1 grid-cols-3 py-16 items-center justify-center">
+            {page > 1 ? (
               <button
                 onClick={onPrevPageClick}
                 className="text-2xl transition-colors hover:text-indigo-600"
               >
                 &larr;
               </button>
-            )}
+            ) : <p className="text-xs">첫 번째 페이지 입니다.</p>}
             <span className="text-sm mx-5">
               Pages {page} of {data?.restaurants.totalPages}
             </span>
-            {page !== data?.restaurants.totalPages && (
+            {page !== data?.restaurants.totalPages ? (
               <button
                 onClick={onNextPageClick}
                 className="text-2xl transition-colors hover:text-indigo-600"
               >
                 &rarr;
               </button>
-            )}
+            ) : <p className="text-xs">마지막 페이지 입니다.</p>}
           </div>
         </div>
       )}
