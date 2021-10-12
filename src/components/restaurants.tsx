@@ -16,7 +16,8 @@ const RestaurantsComp: React.FC<IRestaurantProps> = ({id, coverImage, name, cate
       <div
         style={{ backgroundImage: `url(${coverImage})` }}
         className="bg-gray-400 md:p-36 bg-cover mb-3 py-28"
-      ></div>
+      >
+      </div>
       <h3 className="md:text-lg text-base font-semibold tracking-wide">{name}</h3>
       <span className="flex md:text-sm text-xs pb-1 transform -translate-y-1">
         {address}

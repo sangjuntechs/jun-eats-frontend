@@ -67,6 +67,7 @@ const Search = () => {
               address={restaurant.address}
               categoryName={restaurant.category?.name}
             />
+            
           );
         })}
       </div>

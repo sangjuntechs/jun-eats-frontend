@@ -38,6 +38,7 @@
     "start": "npm run apollo:codegen & npm run tailwind:build & react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "test:cov": "npm test -- --coverage --watchAll=false",
     "eject": "react-scripts eject",
     "apollo:codegen": "apollo client:codegen src/__generated__ --target=typescript --outputFlat"
   },
@@ -61,5 +62,12 @@
   },
   "devDependencies": {
     "@types/react-helmet": "^6.1.2"
+  },
+  "jest" : {
+    "collectCoverageFrom": [
+      "./src/components/**/*.tsx",
+      "./src/pages/**/*.tsx",
+      "./src/routes/**/*.tsx"
+    ]
   }
 }
