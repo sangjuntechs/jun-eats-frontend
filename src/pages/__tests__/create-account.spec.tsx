@@ -1,5 +1,5 @@
 import { ApolloProvider } from "@apollo/client";
-import { render, RenderResult, waitFor } from "@testing-library/react";
+import { render, /*RenderResult,*/ waitFor } from "@testing-library/react";
 import { createMockClient, MockApolloClient } from "mock-apollo-client";
 import React from "react";
 import { HelmetProvider } from "react-helmet-async";
@@ -8,7 +8,7 @@ import CreateAccount from "../create-account";
 
 describe("<CreateAccount /> 컴포넌트", () => {
   let mockedClient: MockApolloClient;
-  let renderResult: RenderResult;
+  //let renderResult: RenderResult;
   beforeEach(async () => {
     await waitFor(() => {
         mockedClient = createMockClient();
