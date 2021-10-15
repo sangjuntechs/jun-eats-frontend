@@ -5,5 +5,4 @@
     "types": ["cypress", "@testing-library/cypress"]
   },
   "include": ["./**/*.*"],
-  "viewportHeight": 1000,
 }
