@@ -22,7 +22,7 @@ describe("로그인 e2e", () => {
       .should("have.text", "필수 항목입니다.");
   });
 
-  it("폼 안에 내용을 넣을 수 있는가", () => {
+  it("로그인이 가능한가", () => {
     cy.visit("/")
       .get('[name="email"]')
       .type("qkrtkdwns050@naver.com")
@@ -32,6 +32,7 @@ describe("로그인 e2e", () => {
       .should("not.have.class", "pointer-event-none")
       .click();
     cy.window().its("localStorage.juneats-token").should("be.a", "string");
+    cy.wait(2000)
   });
 });
 
