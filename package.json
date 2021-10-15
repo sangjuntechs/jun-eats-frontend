@@ -63,6 +63,7 @@
     ]
   },
   "devDependencies": {
+    "@testing-library/cypress": "^8.0.1",
     "@types/react-helmet": "^6.1.2"
   },
   "jest": {
