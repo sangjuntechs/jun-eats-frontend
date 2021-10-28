@@ -14,6 +14,7 @@ import ConfirmEmail from "../pages/user/confirm-email";
 import EditProfile from "../pages/user/edit-profile";
 import VerifyError from "../pages/verify-error";
 import { MyRestaurant } from "../pages/owner/my-restaurant";
+import { AddRestaurant } from "../pages/owner/add-restaurant";
 
 const commonRoutes = [
   {
@@ -50,6 +51,9 @@ const clientRoutes = [
 const OwnerRoutes = [{
   path: "/",
   component: <MyRestaurant />
+}, {
+  path: "/add-restaurant",
+  component: <AddRestaurant />
 }];
 
 export const LoggedInRouter = () => {
