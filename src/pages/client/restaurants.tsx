@@ -143,7 +143,7 @@ const Restaurants = () => {
               );
             })}
           </div>
-          <div className="grid xl:grid-cols-3 sm:gap-x-2 md:gap-y-10 md:w-10/12 mt-20 grid-cols-1 gap-y-7 w-11/12 sm:grid-cols-2">
+          <div className="grid xl:grid-cols-3 sm:gap-x-2 md:gap-y-10 md:w-10/12 mt-20 grid-cols-1 gap-y-7 w-11/12 sm:grid-cols-2 justify-center items-center">
             {data?.restaurants.results?.map((restaurant) => {
               return (
                 <RestaurantsComp
