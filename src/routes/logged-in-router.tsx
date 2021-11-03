@@ -15,6 +15,8 @@ import EditProfile from "../pages/user/edit-profile";
 import VerifyError from "../pages/verify-error";
 import { MyRestaurant } from "../pages/owner/my-restaurant";
 import { AddRestaurant } from "../pages/owner/add-restaurant";
+import { MyRestaurants } from "../pages/owner/my-restaurants";
+import { AddDish } from "../pages/owner/add-dish";
 
 const commonRoutes = [
   {
@@ -54,6 +56,14 @@ const OwnerRoutes = [{
 }, {
   path: "/add-restaurant",
   component: <AddRestaurant />
+},
+{
+  path: "/restaurants/:id",
+  component: <MyRestaurants />
+},
+{
+  path: "/restaurants/:id/add-dish",
+  component: <AddDish />
 }];
 
 export const LoggedInRouter = () => {

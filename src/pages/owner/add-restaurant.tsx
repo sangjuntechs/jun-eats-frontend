@@ -1,20 +1,23 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { gql, useMutation } from "@apollo/client";
+import { gql, useApolloClient, useMutation } from "@apollo/client";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useHistory } from "react-router-dom";
 import { Button } from "../../components/button";
 import { FormError } from "../../components/form-error";
 import {
   createRestaurant,
   createRestaurantVariables,
 } from "../../__generated__/createRestaurant";
+import { MY_RESTAURANTS_QUERY } from "./my-restaurant";
 
 const CREATE_RESTAURANT_MUTATION = gql`
   mutation createRestaurant($input: CreateRestaurantInput!) {
     createRestaurant(input: $input) {
       ok
       error
+      restaurantId
     }
   }
 `;
@@ -28,6 +31,7 @@ interface IFormProps {
 
 export const AddRestaurant = () => {
   const [redBorder, setRedBorder] = useState(false);
+  const [imageUrl, setImageUrl] = useState("");
 
   useEffect(() => {
     if (!isValid) {
@@ -37,12 +41,41 @@ export const AddRestaurant = () => {
     }
   });
 
+  const client = useApolloClient();
+  const history = useHistory();
   const onCompleted = (data: createRestaurant) => {
     const {
-      createRestaurant: { ok, error },
+      createRestaurant: { ok, restaurantId },
     } = data;
     if (ok) {
+      const { name, address, categoryName } = getValues();
       setUploading(false);
+      const queryResult = client.readQuery({ query: MY_RESTAURANTS_QUERY });
+      client.writeQuery({
+        query: MY_RESTAURANTS_QUERY,
+        data: {
+          myRestaurants: {
+            ...queryResult.myRestaurants,
+            restaurants: [
+              {
+                address,
+                category: {
+                  name: categoryName,
+                  __typename: "Category",
+                },
+                coverImage:
+                  imageUrl,
+                id: restaurantId,
+                isPromoted: false,
+                name,
+                __typename: "Restaurant",
+              },
+              ...queryResult.myRestaurants.restaurants,
+            ],
+          },
+        },
+      });
+      history.push('/');
     }
   };
 
@@ -75,6 +108,7 @@ export const AddRestaurant = () => {
           body: formBody,
         })
       ).json();
+      setImageUrl(coverImage)
       createRestaurantMutation({
         variables: {
           input: {
@@ -134,14 +168,14 @@ export const AddRestaurant = () => {
           placeholder="음식점 카테고리"
           {...register("categoryName", { required: "필수 항목입니다." })}
         >
-          <option value='치킨'>치킨</option>
-          <option value='일식'>일식</option>
-          <option value='양식'>양식</option>
-          <option value='패스트푸드'>패스트푸드</option>
-          <option value='한식'>한식</option>
-          <option value='야식'>야식</option>
-          <option value='커피,디저트'>커피/디저트</option>
-          <option value='찜,탕'>찜/탕</option>
+          <option value="치킨">치킨</option>
+          <option value="일식">일식</option>
+          <option value="양식">양식</option>
+          <option value="패스트푸드">패스트푸드</option>
+          <option value="한식">한식</option>
+          <option value="야식">야식</option>
+          <option value="커피,디저트">커피/디저트</option>
+          <option value="찜,탕">찜/탕</option>
         </select>
         {errors.categoryName?.message && (
           <FormError errorMessage={errors.categoryName.message} />
