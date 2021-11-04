@@ -7,7 +7,7 @@ import {
   myRestaurantVariables,
 } from "../../__generated__/myRestaurant";
 
-const MY_RESTAURANTS_QUERY = gql`
+export const MY_RESTAURANTS_QUERY = gql`
   query myRestaurant($input: MyRestaurantsInput!) {
     myRestaurant(input: $input) {
       ok
@@ -40,6 +40,7 @@ export const MyRestaurants = () => {
       },
     }
   );
+  console.log(data)
   return (
     <div>
       <div

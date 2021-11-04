@@ -37,7 +37,7 @@ const RestaurantDetail = () => {
     <div>
         <Helmet><title>{`${ResName} : Jun Eats`}</title></Helmet>
         <header>
-            <div className="w-full py-40 bg-center bg-cover" style={{backgroundImage: `url(${data?.restaurant?.restaurant?.coverImage})`}}>
+            <div className="w-full py-40 bg-center" style={{backgroundImage: `url(${data?.restaurant?.restaurant?.coverImage})`}}>
                 <div className='items-start w-4/12 py-12 pl-44 bg-white'>
                     <h2 className='font-semibold text-2xl mb-3'>{data?.restaurant.restaurant?.name}</h2>
                     <h3 className="text-sm text-gray-500">{data?.restaurant.restaurant?.address}</h3>
