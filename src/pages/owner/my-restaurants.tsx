@@ -1,6 +1,7 @@
 import { gql, useQuery } from "@apollo/client";
 import React from "react";
 import { Link, useParams } from "react-router-dom";
+import { DishComp } from "../../components/Dish";
 import { DISH_FRAGMENT, RESTAURANT_FRAGMENT } from "../../fragments";
 import {
   myRestaurant,
@@ -79,7 +80,13 @@ export const MyRestaurants = () => {
               아직 아무런 메뉴가 없습니다. 메뉴를 등록해주세요!
             </p>
           ) : (
-            ""
+              <>
+            <div className="grid xl:grid-cols-3 xl:w-full sm:gap-x-2 md:w-full xl:gap-5 mt-20 grid-cols-1 sm:grid-cols-2 gap-x-3 mx-auto w-full">
+                {data?.myRestaurant.restaurant?.menu.map((dish) => (
+                    <DishComp name={dish.name} description={dish.description} price={dish.price} />
+                ))}
+            </div>
+            </>
           )}
         </div>
       </div>

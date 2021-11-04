@@ -37,16 +37,14 @@ export const AddDish = () => {
     createDish,
     createDishVariables
   >(CREATE_DISH_MUTATION, {
-    refetchQueries: [
-      {
-        query: MY_RESTAURANTS_QUERY,
-        variables: {
-          input: {
-            id: +restaurantId,
-          },
-        },
-      },
-    ],
+      refetchQueries: [{
+          query: MY_RESTAURANTS_QUERY,
+          variables: {
+              input: {
+                  id: +restaurantId,
+              }
+          }
+      }]
   });
 
   const {
@@ -54,34 +52,43 @@ export const AddDish = () => {
     getValues,
     formState: { errors, isValid },
     handleSubmit,
+    setValue,
   } = useForm<IDishForm>({
     mode: "onChange",
   });
 
   const onSubmit = () => {
     const { name, description, price, ...rest } = getValues();
-    console.log(rest);
-    /*createDishMutation({
+    const optionObjects = optionNumber.map((theId) => ({
+      name: rest[`${theId}-OptionName`],
+      extra: +rest[`${theId}-OptionExtra`],
+    }));
+    createDishMutation({
       variables: {
         input: {
           name,
           price: +price,
           description,
           restaurantId: +restaurantId,
+          option: optionObjects,
         },
       },
     });
     history.goBack();
-    */
   };
 
-  const [optionNumber, setOptionNumber] = useState(0);
-
+  const [optionNumber, setOptionNumber] = useState<number[]>([]);
   const optionClick = () => {
-    setOptionNumber((current) => current + 1);
+    setOptionNumber((curr) => [Date.now(), ...curr]);
   };
 
-  const optionDelClick = (idForDelete: number) => {};
+  const optionDelClick = (idForDelete: number) => {
+    setOptionNumber((current) => current.filter((id) => id !== idForDelete));
+    //@ts-ignore
+    setValue(`${idForDelete}-OptionName`, "");
+    //@ts-ignore
+    setValue(`${idForDelete}-OptionExtra`, "");
+  };
 
   return (
     <div>
@@ -127,32 +134,28 @@ export const AddDish = () => {
           >
             옵션 추가하기
           </span>
-          {optionNumber !== 0 &&
-            Array.from(new Array(optionNumber)).map((_, index) => {
+          {optionNumber.length !== 0 &&
+            optionNumber.map((id) => {
               return (
-                <div key={index} className="mt-3">
-                  {index + 1}
+                <div key={id} className="mt-3">
                   <input
                     className="p-2 m-2 focus:outline-none focus:border-gray-600 border-2"
                     //@ts-ignore
-                    {...register(`${index}-OptionName`, {
-                      required: "필수 항목입니다.",
-                    })}
+                    {...register(`${id}-OptionName`, {})}
                     type="text"
                     placeholder="옵션 이름"
                   />
                   <input
                     className="p-2 m-2 focus:outline-none focus:border-gray-600 border-2"
                     //@ts-ignore
-                    {...register(`${index}-OptionExtra`, {
-                      required: "필수 항목입니다.",
-                    })}
+                    {...register(`${id}-OptionExtra`, {})}
                     type="number"
                     placeholder="옵션 추가 가격"
+                    defaultValue={0}
                     min={0}
                   />
                   <span
-                    onClick={() => optionDelClick(index)}
+                    onClick={() => optionDelClick(id)}
                     className="bg-gray-800 py-3 px-3 text-white cursor-pointer"
                   >
                     옵션 삭제
