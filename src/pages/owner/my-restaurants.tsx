@@ -7,6 +7,7 @@ import {
   myRestaurant,
   myRestaurantVariables,
 } from "../../__generated__/myRestaurant";
+import { VictoryAxis, VictoryBar, VictoryChart } from "victory";
 
 export const MY_RESTAURANTS_QUERY = gql`
   query myRestaurant($input: MyRestaurantsInput!) {
@@ -25,6 +26,19 @@ export const MY_RESTAURANTS_QUERY = gql`
   ${DISH_FRAGMENT}
 `;
 
+const chartData = [
+  {
+    x: 1,
+    y: 60000,
+  },
+  { x: 2, y: 100000 },
+  { x: 3, y: 57000 },
+  { x: 4, y: 122000 },
+  { x: 5, y: 208000 },
+  { x: 6, y: 112000 },
+  { x: 7, y: 35000 },
+];
+
 interface IParams {
   id: string;
 }
@@ -41,7 +55,7 @@ export const MyRestaurants = () => {
       },
     }
   );
-  console.log(data)
+  console.log(data);
   return (
     <div>
       <div
@@ -80,14 +94,28 @@ export const MyRestaurants = () => {
               아직 아무런 메뉴가 없습니다. 메뉴를 등록해주세요!
             </p>
           ) : (
-              <>
-            <div className="grid xl:grid-cols-3 xl:w-full sm:gap-x-2 md:w-full xl:gap-5 mt-20 grid-cols-1 sm:grid-cols-2 gap-x-3 mx-auto w-full">
+            <>
+              <div className="grid xl:grid-cols-3 xl:w-full sm:gap-x-2 md:w-full xl:gap-5 mt-20 grid-cols-1 sm:grid-cols-2 gap-x-3 mx-auto w-full">
                 {data?.myRestaurant.restaurant?.menu.map((dish) => (
-                    <DishComp name={dish.name} description={dish.description} price={dish.price} />
+                  <DishComp
+                    name={dish.name}
+                    description={dish.description}
+                    price={dish.price}
+                  />
                 ))}
-            </div>
+              </div>
             </>
           )}
+        </div>
+        <div className="mt-32 mb-20">
+          <h4 className="text-center text-2xl font-light">매장 판매 현황</h4>
+          <div className="max-w-screen-lg mx-auto w-full mt-10">
+            <VictoryChart width={window.innerWidth} height={800} domainPadding={70}>
+              <VictoryAxis style={{tickLabels: {fontSize:12, fill:"#6f3ecd"}}} tickFormat={(step) => `${step/10000}M ￦`} dependentAxis />
+              <VictoryAxis style={{tickLabels: {fontSize:20, fill:"#6f3ecd"}}} tickFormat={(step) => `${step}일`} />
+              <VictoryBar data={chartData} />
+            </VictoryChart>
+          </div>
         </div>
       </div>
     </div>
