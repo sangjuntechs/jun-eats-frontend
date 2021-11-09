@@ -1,5 +1,5 @@
+import React, { useState } from "react";
 import { gql, useQuery } from "@apollo/client";
-import React from "react";
 import { Helmet } from "react-helmet-async";
 import { useParams } from "react-router-dom";
 import { DishComp } from "../../components/Dish";
@@ -30,9 +30,8 @@ const RESTAURANT_QUERY = gql`
   ${DISH_FRAGMENT}
 `;
 
-const triggerStartOrder = () => {
-  
-}
+
+
 
 const RestaurantDetail = () => {
   const params = useParams<IRestaurantProps>();
@@ -44,6 +43,10 @@ const RestaurantDetail = () => {
     },
   });
   const ResName = data?.restaurant.restaurant?.name;
+  const [orderStarted, setOrderStarted] = useState(false);
+  const triggerStartOrder = () => {
+    setOrderStarted(true);
+  }
 
   return (
     <div>
@@ -75,6 +78,7 @@ const RestaurantDetail = () => {
         {data?.restaurant.restaurant?.menu.length !== 0
           ? data?.restaurant.restaurant?.menu.map((dish, index) => (
               <DishComp
+                orderStart={orderStarted}
                 key={index}
                 name={dish.name}
                 description={dish.description}

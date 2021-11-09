@@ -7,6 +7,7 @@ interface IDishProps {
   description: string;
   isCustomer?: boolean;
   option?: restaurant_restaurant_restaurant_menu_option[] | null;
+  orderStart?: boolean;
 }
 
 export const DishComp: React.FC<IDishProps> = ({
@@ -15,6 +16,7 @@ export const DishComp: React.FC<IDishProps> = ({
   price,
   isCustomer = false,
   option,
+  orderStart = false,
 }) => {
   console.log(option)
   return (
