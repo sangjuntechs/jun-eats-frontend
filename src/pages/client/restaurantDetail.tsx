@@ -9,6 +9,7 @@ import {
   restaurantVariables,
 } from "../../__generated__/restaurant";
 import { CreateOrderItemInput } from "../../__generated__/globalTypes";
+import { DishOption } from "../../components/dish-option";
 
 interface IRestaurantProps {
   id: string;
@@ -81,6 +82,27 @@ const RestaurantDetail = () => {
     if (item) {
       return Boolean(getOptionFromItem(item, optionName));
     }
+    return false;
+  };
+
+  const removeOptionFromItem = (dishId: number, optionName: string) => {
+    if (!isSelected(dishId)) {
+      return;
+    }
+    const oldItem = getItem(dishId);
+    if (oldItem) {
+      removeFromOrder(dishId);
+      setOrderItems((current) => [
+        {
+          dishId,
+          options: oldItem.options?.filter(
+            (option) => option.name !== optionName
+          ),
+        },
+        ...current,
+      ]);
+      return;
+    }
   };
 
   console.log(orderItems);
@@ -91,7 +113,7 @@ const RestaurantDetail = () => {
     );
   };
 
-  const addOptionToItem = (dishId: number, option: any) => {
+  const addOptionToItem = (dishId: number, optionName: any) => {
     if (!isSelected(dishId)) {
       return;
     }
@@ -99,12 +121,12 @@ const RestaurantDetail = () => {
     const oldItem = getItem(dishId);
     if (oldItem) {
       const hasOptions = Boolean(
-        oldItem.options?.find((aOption) => aOption.name === option.name)
+        oldItem.options?.find((aOption) => aOption.name === optionName)
       );
       if (!hasOptions) {
         removeFromOrder(dishId);
         setOrderItems((current) => [
-          { dishId, options: [option, ...oldItem.options!] },
+          { dishId, options: [{name:optionName}, ...oldItem.options!] },
           ...current,
         ]);
       }
@@ -161,24 +183,16 @@ const RestaurantDetail = () => {
                 {dish.option?.map((opt, index) => {
                   return (
                     <>
-                      <span
-                        onClick={() =>
-                          addOptionToItem
-                            ? addOptionToItem(dish.id, {
-                                name: opt.name,
-                              })
-                            : null
-                        }
-                        className={`px-3 py-1 text-white text-sm inline-block mr-2 mt-1  transition-colors items-center ${
-                          isOptionSelected(dish.id, opt.name)
-                            ? "bg-gray-400 hover:bg-gray-400"
-                            : "bg-indigo-600 hover:bg-indigo-500"
-                        }`}
+                      <DishOption
                         key={index}
-                      >
-                        <p className="mr-2">{opt.name}</p>
-                        <p className="text-xs">+{opt.extra}원</p>
-                      </span>
+                        isOptionSelected={isOptionSelected(dish.id, opt.name)}
+                        isSelected={isSelected(dish.id)}
+                        name={opt.name}
+                        extra={opt.extra}
+                        addOptionToItem={addOptionToItem}
+                        dishId={dish.id}
+                        removeOptionFromItem={removeOptionFromItem}
+                      />
                     </>
                   );
                 })}
