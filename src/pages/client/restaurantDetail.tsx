@@ -66,8 +66,23 @@ const RestaurantDetail = () => {
     if (isSelected(dishId)) {
       return;
     }
-    setOrderItems((current) => [{ dishId, options:[] }, ...current]);
+    setOrderItems((current) => [{ dishId, options: [] }, ...current]);
   };
+
+  const getOptionFromItem = (
+    item: CreateOrderItemInput,
+    optionName: string
+  ) => {
+    return item.options?.find((option) => option.name === optionName);
+  };
+
+  const isOptionSelected = (dishId: number, optionName: string) => {
+    const item = getItem(dishId);
+    if (item) {
+      return Boolean(getOptionFromItem(item, optionName));
+    }
+  };
+
   console.log(orderItems);
 
   const removeFromOrder = (dishId: number) => {
@@ -83,11 +98,16 @@ const RestaurantDetail = () => {
 
     const oldItem = getItem(dishId);
     if (oldItem) {
-      removeFromOrder(dishId);
-      setOrderItems((current) => [
-        { dishId, options: [option, ...oldItem.options!] },
-        ...current,
-      ]);
+      const hasOptions = Boolean(
+        oldItem.options?.find((aOption) => aOption.name === option.name)
+      );
+      if (!hasOptions) {
+        removeFromOrder(dishId);
+        setOrderItems((current) => [
+          { dishId, options: [option, ...oldItem.options!] },
+          ...current,
+        ]);
+      }
     }
   };
 
@@ -126,8 +146,8 @@ const RestaurantDetail = () => {
         {data?.restaurant.restaurant?.menu.length !== 0
           ? data?.restaurant.restaurant?.menu.map((dish, index) => (
               <DishComp
-                isSelected={isSelected(dish.id)}
                 key={index}
+                isSelected={isSelected(dish.id)}
                 id={dish.id}
                 orderStart={orderStarted}
                 name={dish.name}
@@ -137,8 +157,32 @@ const RestaurantDetail = () => {
                 option={dish.option}
                 addItemToOrder={addItemToOrder}
                 removeFromOrder={removeFromOrder}
-                addOptionToItem={addOptionToItem}
-              />
+              >
+                {dish.option?.map((opt, index) => {
+                  return (
+                    <>
+                      <span
+                        onClick={() =>
+                          addOptionToItem
+                            ? addOptionToItem(dish.id, {
+                                name: opt.name,
+                              })
+                            : null
+                        }
+                        className={`px-3 py-1 text-white text-sm inline-block mr-2 mt-1  transition-colors items-center ${
+                          isOptionSelected(dish.id, opt.name)
+                            ? "bg-gray-400 hover:bg-gray-400"
+                            : "bg-indigo-600 hover:bg-indigo-500"
+                        }`}
+                        key={index}
+                      >
+                        <p className="mr-2">{opt.name}</p>
+                        <p className="text-xs">+{opt.extra}원</p>
+                      </span>
+                    </>
+                  );
+                })}
+              </DishComp>
             ))
           : "메뉴를 준비 중 입니다."}
       </div>
