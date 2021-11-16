@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState } from "react";
-import { gql, useQuery } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import { Helmet } from "react-helmet-async";
-import { useParams } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import { DishComp } from "../../components/Dish";
 import { DISH_FRAGMENT, RESTAURANT_FRAGMENT } from "../../fragments";
 import {
@@ -10,6 +11,10 @@ import {
 } from "../../__generated__/restaurant";
 import { CreateOrderItemInput } from "../../__generated__/globalTypes";
 import { DishOption } from "../../components/dish-option";
+import {
+  createOrder,
+  createOrderVariables,
+} from "../../__generated__/createOrder";
 
 interface IRestaurantProps {
   id: string;
@@ -37,6 +42,7 @@ const CREATE_ORDER_MUTATION = gql`
     createOrder(input: $input) {
       ok
       error
+      orderId
     }
   }
 `;
@@ -105,7 +111,46 @@ const RestaurantDetail = () => {
     }
   };
 
-  console.log(orderItems);
+
+  const triggerOrderCancel = () => {
+    setOrderStarted(false);
+    setOrderItems([]);
+  };
+
+  const history = useHistory();
+
+  const onCompleted = (data: createOrder) => {
+    const {
+      createOrder: { ok, orderId },
+    } = data;
+    if (data.createOrder.ok) {
+      history.push(`/orders/${orderId}`);
+    }
+  };
+
+  const [createOrderMutation, { loading: placingOrder }] = useMutation<
+    createOrder,
+    createOrderVariables
+  >(CREATE_ORDER_MUTATION, {
+    onCompleted,
+  });
+
+  const triggerOrderConfirm = () => {
+    if (orderItems.length === 0) {
+      window.confirm("최소 한 개 이상의 메뉴를 선택해야합니다.");
+    }
+    const ok = window.confirm("주문이 완료되었습니다.");
+    if (ok && !placingOrder) {
+      createOrderMutation({
+        variables: {
+          input: {
+            restaurantId: +params.id,
+            items: orderItems,
+          },
+        },
+      });
+    }
+  };
 
   const removeFromOrder = (dishId: number) => {
     setOrderItems((current) =>
@@ -126,7 +171,7 @@ const RestaurantDetail = () => {
       if (!hasOptions) {
         removeFromOrder(dishId);
         setOrderItems((current) => [
-          { dishId, options: [{name:optionName}, ...oldItem.options!] },
+          { dishId, options: [{ name: optionName }, ...oldItem.options!] },
           ...current,
         ]);
       }
@@ -158,12 +203,31 @@ const RestaurantDetail = () => {
           </div>
         </div>
       </header>
-      <button
-        onClick={triggerStartOrder}
-        className="mt-16 ml-3 bg-indigo-600 text-white py-3 px-4 xl:ml-20 hover:bg-indigo-500 transition-colors"
-      >
-        {orderStarted ? "담는 중" : "메뉴 담기"}
-      </button>
+      {!orderStarted && (
+        <button
+          onClick={triggerStartOrder}
+          className="mt-16 ml-3 bg-indigo-600 text-white py-3 px-4 xl:ml-20 hover:bg-indigo-500 transition-colors"
+        >
+          메뉴 담기
+        </button>
+      )}
+      {orderStarted && (
+        <>
+          <button
+            onClick={triggerOrderConfirm}
+            className="mt-16 bg-indigo-600 text-white py-3 px-4 xl:ml-20 hover:bg-indigo-500 transition-colors"
+          >
+            주문하기
+          </button>
+          <button
+            onClick={triggerOrderCancel}
+            className="mt-16 ml-3 bg-red-500 text-white py-3 px-4 hover:bg-red-400 transition-colors"
+          >
+            취소
+          </button>
+        </>
+      )}
+
       <div className="grid xl:grid-cols-3 xl:max-w-screen-2xl sm:gap-x-2 md:w-full xl:gap-5 mt-12 grid-cols-1 sm:grid-cols-2 gap-x-3 mx-auto w-full">
         {data?.restaurant.restaurant?.menu.length !== 0
           ? data?.restaurant.restaurant?.menu.map((dish, index) => (
