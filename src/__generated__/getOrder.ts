@@ -24,6 +24,24 @@ export interface getOrder_getOrder_order_restaurant {
   name: string;
 }
 
+export interface getOrder_getOrder_order_items_dish_option {
+  __typename: "DishOption";
+  name: string;
+  extra: number | null;
+}
+
+export interface getOrder_getOrder_order_items_dish {
+  __typename: "Dish";
+  price: number;
+  name: string;
+  option: getOrder_getOrder_order_items_dish_option[] | null;
+}
+
+export interface getOrder_getOrder_order_items {
+  __typename: "OrderItem";
+  dish: getOrder_getOrder_order_items_dish;
+}
+
 export interface getOrder_getOrder_order {
   __typename: "Order";
   id: number;
@@ -32,6 +50,7 @@ export interface getOrder_getOrder_order {
   driver: getOrder_getOrder_order_driver | null;
   customer: getOrder_getOrder_order_customer | null;
   restaurant: getOrder_getOrder_order_restaurant | null;
+  items: getOrder_getOrder_order_items[];
 }
 
 export interface getOrder_getOrder {
