@@ -1,6 +1,6 @@
-import { gql, useQuery } from "@apollo/client";
-import React from "react";
-import { Link, useParams } from "react-router-dom";
+import { gql, useQuery, useSubscription } from "@apollo/client";
+import React, { useEffect } from "react";
+import { Link, useHistory, useParams } from "react-router-dom";
 import { DishComp } from "../../components/Dish";
 import { DISH_FRAGMENT, RESTAURANT_FRAGMENT } from "../../fragments";
 import {
@@ -8,6 +8,7 @@ import {
   myRestaurantVariables,
 } from "../../__generated__/myRestaurant";
 import { VictoryAxis, VictoryBar, VictoryChart } from "victory";
+import { pendingOrders } from "../../__generated__/pendingOrders";
 
 export const MY_RESTAURANTS_QUERY = gql`
   query myRestaurant($input: MyRestaurantsInput!) {
@@ -39,6 +40,35 @@ const chartData = [
   { x: 7, y: 35000 },
 ];
 
+const PENDING_ORDERS_SUBSCRIPTION = gql`
+  subscription pendingOrders {
+    pendingOrders {
+      id
+      total
+      status
+      driver {
+        email
+      }
+      customer {
+        email
+      }
+      restaurant {
+        name
+      }
+      items {
+        dish {
+          price
+          name
+          option {
+            name
+            extra
+          }
+        }
+      }
+    }
+  }
+`;
+
 interface IParams {
   id: string;
 }
@@ -55,7 +85,18 @@ export const MyRestaurants = () => {
       },
     }
   );
-  console.log(data);
+
+  const { data: subscriptionData } = useSubscription<pendingOrders>(
+    PENDING_ORDERS_SUBSCRIPTION
+  );
+  const history = useHistory();
+  useEffect(() => {
+    if(subscriptionData?.pendingOrders.id) {
+      history.push(`/orders/${subscriptionData.pendingOrders.id}`)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subscriptionData])
+
   return (
     <div>
       <div
@@ -110,9 +151,20 @@ export const MyRestaurants = () => {
         <div className="mt-32 mb-20">
           <h4 className="text-center text-2xl font-light">매장 판매 현황</h4>
           <div className="max-w-screen-lg mx-auto w-full mt-10">
-            <VictoryChart width={window.innerWidth} height={800} domainPadding={70}>
-              <VictoryAxis style={{tickLabels: {fontSize:12, fill:"#6f3ecd"}}} tickFormat={(step) => `${step/10000}M ￦`} dependentAxis />
-              <VictoryAxis style={{tickLabels: {fontSize:20, fill:"#6f3ecd"}}} tickFormat={(step) => `${step}일`} />
+            <VictoryChart
+              width={window.innerWidth}
+              height={800}
+              domainPadding={70}
+            >
+              <VictoryAxis
+                style={{ tickLabels: { fontSize: 12, fill: "#6f3ecd" } }}
+                tickFormat={(step) => `${step / 10000}M ￦`}
+                dependentAxis
+              />
+              <VictoryAxis
+                style={{ tickLabels: { fontSize: 20, fill: "#6f3ecd" } }}
+                tickFormat={(step) => `${step}일`}
+              />
               <VictoryBar data={chartData} />
             </VictoryChart>
           </div>
