@@ -4,9 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { useParams } from "react-router-dom";
 import { useMe } from "../../hooks/useMe";
 import { getOrder, getOrderVariables } from "../../__generated__/getOrder";
-import {
-  orderUpdates,
-} from "../../__generated__/orderUpdates";
+import { orderUpdates } from "../../__generated__/orderUpdates";
 
 const GET_ORDER = gql`
   query getOrder($input: GetOrderInput!) {
@@ -76,7 +74,7 @@ interface IParams {
 
 export const Order = () => {
   const params = useParams<IParams>();
-  const {data:userData} = useMe();
+  const { data: userData } = useMe();
   const { data, subscribeToMore } = useQuery<getOrder, getOrderVariables>(
     GET_ORDER,
     {
@@ -103,19 +101,19 @@ export const Order = () => {
             subscriptionData: { data },
           }: { subscriptionData: { data: orderUpdates } }
         ) => {
-            if(!data) return prev
-            return {
-                getOrder: {
-                    ...prev.getOrder,
-                    order: {
-                        ...data.orderUpdates
-                    }
-                }
-            }
+          if (!data) return prev;
+          return {
+            getOrder: {
+              ...prev.getOrder,
+              order: {
+                ...data.orderUpdates,
+              },
+            },
+          };
         },
       });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
   return (
@@ -131,7 +129,7 @@ export const Order = () => {
           </p>
         </div>
         <h2 className="text-xl p-2 mt-3">
-          {data?.getOrder.order?.restaurant?.name} 주문서
+          {data?.getOrder.order?.restaurant?.name} 주문서{userData?.me.role === "Owner" && " (매장용)"}
         </h2>
         {data?.getOrder.order?.items.map((item, index) => {
           return (
@@ -150,20 +148,32 @@ export const Order = () => {
             ? data?.getOrder.order?.driver?.email
             : "아직 배정되지 않았습니다."}
         </p>
-        {userData?.me.role === 'Client' && <p className="text-indigo-600 p-2 pt-0 text-base font-semibold">
-          배달 상태 :{" "}
-          {data?.getOrder.order?.status === "Pending"
-            ? "주문 확인중"
-            : data?.getOrder.order?.status === "Cooking"
-            ? "조리 중"
-            : data?.getOrder.order?.status === "Cooked"
-            ? "조리 완료"
-            : ""}
-        </p>}
-        {userData?.me.role === "Owner" && <>
-            {data?.getOrder.order?.status === "Pending" && <button>주문 수락</button>}
-            {data?.getOrder.order?.status === "Cooking" && <button>조리완료 알람 보내기</button>}
-        </>}
+        {userData?.me.role === "Client" && (
+          <p className="text-indigo-600 p-2 pt-0 text-base font-semibold">
+            배달 상태 :{" "}
+            {data?.getOrder.order?.status === "Pending"
+              ? "주문 확인중"
+              : data?.getOrder.order?.status === "Cooking"
+              ? "조리 중"
+              : data?.getOrder.order?.status === "Cooked"
+              ? "조리 완료"
+              : ""}
+          </p>
+        )}
+        {userData?.me.role === "Owner" && (
+          <>
+            {data?.getOrder.order?.status === "Pending" && (
+              <button className="py-2 px-3 bg-indigo-600 text-white font-semibold hover:bg-indigo-500 transition-colors">
+                주문 수락
+              </button>
+            )}
+            {data?.getOrder.order?.status === "Cooking" && (
+              <button className="py-2 px-3 bg-indigo-600 text-white font-semibold hover:bg-indigo-500 transition-colors">
+                조리완료 알람 보내기
+              </button>
+            )}
+          </>
+        )}
         <h3 className="text-2xl font-serif mt-5 text-right p-2 pb-0">
           총 주문금액 {data?.getOrder.order?.total}원
         </h3>
