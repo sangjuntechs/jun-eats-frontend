@@ -1,9 +1,11 @@
-import { gql, useQuery } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import React, { useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { useParams } from "react-router-dom";
 import { useMe } from "../../hooks/useMe";
+import { editOrder, editOrderVariables } from "../../__generated__/editOrder";
 import { getOrder, getOrderVariables } from "../../__generated__/getOrder";
+import { OrderStatus } from "../../__generated__/globalTypes";
 import { orderUpdates } from "../../__generated__/orderUpdates";
 
 const GET_ORDER = gql`
@@ -68,12 +70,24 @@ const ORDER_SUBSCRIPTION = gql`
   }
 `;
 
+const EDIT_ORDER = gql`
+  mutation editOrder($input: EditOrderInput!) {
+    editOrder(input: $input) {
+      ok
+      error
+    }
+  }
+`;
+
 interface IParams {
   id: string;
 }
 
 export const Order = () => {
   const params = useParams<IParams>();
+  const [editOrderMutation] = useMutation<editOrder, editOrderVariables>(
+    EDIT_ORDER
+  );
   const { data: userData } = useMe();
   const { data, subscribeToMore } = useQuery<getOrder, getOrderVariables>(
     GET_ORDER,
@@ -116,6 +130,17 @@ export const Order = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
+  const onButtonClick = (newStatus: OrderStatus) => {
+    editOrderMutation({
+      variables: {
+        input:{
+          id: +params.id,
+          status: newStatus,
+        }
+      }
+    })
+  }
+
   return (
     <div className="max-w-screen-2xl flex items-center justify-center">
       <Helmet>
@@ -129,7 +154,8 @@ export const Order = () => {
           </p>
         </div>
         <h2 className="text-xl p-2 mt-3">
-          {data?.getOrder.order?.restaurant?.name} 주문서{userData?.me.role === "Owner" && " (매장용)"}
+          {data?.getOrder.order?.restaurant?.name} 주문서
+          {userData?.me.role === "Owner" && " (매장용)"}
         </h2>
         {data?.getOrder.order?.items.map((item, index) => {
           return (
@@ -162,13 +188,13 @@ export const Order = () => {
         )}
         {userData?.me.role === "Owner" && (
           <>
-            {data?.getOrder.order?.status === "Pending" && (
-              <button className="py-2 px-3 bg-indigo-600 text-white font-semibold hover:bg-indigo-500 transition-colors">
+            {data?.getOrder.order?.status === OrderStatus.Pending && (
+              <button onClick={() => onButtonClick(OrderStatus.Cooking)} className="py-2 px-3 bg-indigo-600 text-white font-semibold hover:bg-indigo-500 transition-colors">
                 주문 수락
               </button>
             )}
-            {data?.getOrder.order?.status === "Cooking" && (
-              <button className="py-2 px-3 bg-indigo-600 text-white font-semibold hover:bg-indigo-500 transition-colors">
+            {data?.getOrder.order?.status === OrderStatus.Cooking && (
+              <button onClick={() => onButtonClick(OrderStatus.Cooked)} className="py-2 px-3 bg-indigo-600 text-white font-semibold hover:bg-indigo-500 transition-colors">
                 조리완료 알람 보내기
               </button>
             )}
