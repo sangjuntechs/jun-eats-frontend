@@ -58,3 +58,11 @@ export const FULL_ORDER_FRAGMENT = gql`
     }
   }
 `;
+
+export const ORDERS_FRAGMENT = gql`
+  fragment OrderParts on Order {
+    id
+    createAt
+    total
+  }
+`

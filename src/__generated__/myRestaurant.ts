@@ -37,6 +37,13 @@ export interface myRestaurant_myRestaurant_restaurant_menu {
   option: myRestaurant_myRestaurant_restaurant_menu_option[] | null;
 }
 
+export interface myRestaurant_myRestaurant_restaurant_order {
+  __typename: "Order";
+  id: number;
+  createAt: any;
+  total: number | null;
+}
+
 export interface myRestaurant_myRestaurant_restaurant {
   __typename: "Restaurant";
   id: number;
@@ -46,6 +53,7 @@ export interface myRestaurant_myRestaurant_restaurant {
   address: string;
   isPromoted: boolean;
   menu: myRestaurant_myRestaurant_restaurant_menu[];
+  order: myRestaurant_myRestaurant_restaurant_order[];
 }
 
 export interface myRestaurant_myRestaurant {

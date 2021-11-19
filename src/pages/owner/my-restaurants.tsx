@@ -2,12 +2,23 @@ import { gql, useQuery, useSubscription } from "@apollo/client";
 import React, { useEffect } from "react";
 import { Link, useHistory, useParams } from "react-router-dom";
 import { DishComp } from "../../components/Dish";
-import { DISH_FRAGMENT, RESTAURANT_FRAGMENT } from "../../fragments";
+import {
+  DISH_FRAGMENT,
+  ORDERS_FRAGMENT,
+  RESTAURANT_FRAGMENT,
+} from "../../fragments";
 import {
   myRestaurant,
   myRestaurantVariables,
 } from "../../__generated__/myRestaurant";
-import { VictoryAxis, VictoryBar, VictoryChart } from "victory";
+import {
+  VictoryAxis,
+  VictoryChart,
+  VictoryLabel,
+  VictoryLine,
+  VictoryTheme,
+  VictoryVoronoiContainer,
+} from "victory";
 import { pendingOrders } from "../../__generated__/pendingOrders";
 
 export const MY_RESTAURANTS_QUERY = gql`
@@ -20,25 +31,16 @@ export const MY_RESTAURANTS_QUERY = gql`
         menu {
           ...DishesPart
         }
+        order {
+          ...OrderParts
+        }
       }
     }
   }
   ${RESTAURANT_FRAGMENT}
   ${DISH_FRAGMENT}
+  ${ORDERS_FRAGMENT}
 `;
-
-const chartData = [
-  {
-    x: 1,
-    y: 60000,
-  },
-  { x: 2, y: 100000 },
-  { x: 3, y: 57000 },
-  { x: 4, y: 122000 },
-  { x: 5, y: 208000 },
-  { x: 6, y: 112000 },
-  { x: 7, y: 35000 },
-];
 
 const PENDING_ORDERS_SUBSCRIPTION = gql`
   subscription pendingOrders {
@@ -91,11 +93,13 @@ export const MyRestaurants = () => {
   );
   const history = useHistory();
   useEffect(() => {
-    if(subscriptionData?.pendingOrders.id) {
-      history.push(`/orders/${subscriptionData.pendingOrders.id}`)
+    if (subscriptionData?.pendingOrders.id) {
+      history.push(`/orders/${subscriptionData.pendingOrders.id}`);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [subscriptionData])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subscriptionData]);
+
+  console.log(data);
 
   return (
     <div>
@@ -139,6 +143,7 @@ export const MyRestaurants = () => {
               <div className="grid xl:grid-cols-3 xl:w-full sm:gap-x-2 md:w-full xl:gap-5 mt-20 grid-cols-1 sm:grid-cols-2 gap-x-3 mx-auto w-full">
                 {data?.myRestaurant.restaurant?.menu.map((dish) => (
                   <DishComp
+                    key={dish.id}
                     name={dish.name}
                     description={dish.description}
                     price={dish.price}
@@ -149,23 +154,34 @@ export const MyRestaurants = () => {
           )}
         </div>
         <div className="mt-32 mb-20">
-          <h4 className="text-center text-2xl font-light">매장 판매 현황</h4>
+          <h4 className="text-center text-2xl font-light">금주 매장 판매 현황</h4>
           <div className="max-w-screen-lg mx-auto w-full mt-10">
             <VictoryChart
+              theme={VictoryTheme.material}
+              domainPadding={30}
+              height={550}
               width={window.innerWidth}
-              height={800}
-              domainPadding={70}
+              containerComponent={<VictoryVoronoiContainer />}
             >
-              <VictoryAxis
-                style={{ tickLabels: { fontSize: 12, fill: "#6f3ecd" } }}
-                tickFormat={(step) => `${step / 10000}M ￦`}
-                dependentAxis
+              <VictoryLine
+                labels={({ datum }) => `${datum.y} 원`}
+                labelComponent={
+                  <VictoryLabel
+                    style={{ fontSize: 20 }}
+                    renderInPortal
+                    dy={-25}
+                  />
+                }
+                data={data?.myRestaurant.restaurant?.order.slice(3,10).map((order) => ({
+                  x: order.createAt,
+                  y: order.total,
+                }))}
+                style={{ data: { strokeWidth: 4 } }}
               />
               <VictoryAxis
-                style={{ tickLabels: { fontSize: 20, fill: "#6f3ecd" } }}
-                tickFormat={(step) => `${step}일`}
+                style={{ tickLabels: { fontSize: 18 } }}
+                tickFormat={(tick) => new Date(tick).toLocaleDateString("ko")}
               />
-              <VictoryBar data={chartData} />
             </VictoryChart>
           </div>
         </div>
