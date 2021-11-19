@@ -133,13 +133,13 @@ export const Order = () => {
   const onButtonClick = (newStatus: OrderStatus) => {
     editOrderMutation({
       variables: {
-        input:{
+        input: {
           id: +params.id,
           status: newStatus,
-        }
-      }
-    })
-  }
+        },
+      },
+    });
+  };
 
   return (
     <div className="max-w-screen-2xl flex items-center justify-center">
@@ -183,19 +183,75 @@ export const Order = () => {
               ? "조리 중"
               : data?.getOrder.order?.status === "Cooked"
               ? "조리 완료"
+              : data?.getOrder.order?.status === "PickedUp"
+              ? "픽업 완료"
+              : data?.getOrder.order?.status === "Delivered"
+              ? "배달 완료"
+              : ""}
+          </p>
+        )}
+        {userData?.me.role === "Delivery" && (
+          <p className="text-indigo-600 p-2 pt-0 text-base font-semibold">
+            배달 상태 :{" "}
+            {data?.getOrder.order?.status === "Pending"
+              ? "주문 확인중"
+              : data?.getOrder.order?.status === "Cooking"
+              ? "조리 중"
+              : data?.getOrder.order?.status === "Cooked"
+              ? "조리 완료"
+              : data?.getOrder.order?.status === "PickedUp"
+              ? "픽업 완료"
+              : data?.getOrder.order?.status === "Delivered"
+              ? "배달 완료"
+              : ""}
+          </p>
+        )}
+        {userData?.me.role === "Owner" && (
+          <p className="text-indigo-600 p-2 pt-0 text-base font-semibold">
+            배달 상태 :{" "}
+            {data?.getOrder.order?.status === "PickedUp"
+              ? "픽업 완료"
+              : data?.getOrder.order?.status === "Delivered"
+              ? "배달 완료"
               : ""}
           </p>
         )}
         {userData?.me.role === "Owner" && (
           <>
             {data?.getOrder.order?.status === OrderStatus.Pending && (
-              <button onClick={() => onButtonClick(OrderStatus.Cooking)} className="py-2 px-3 bg-indigo-600 text-white font-semibold hover:bg-indigo-500 transition-colors">
+              <button
+                onClick={() => onButtonClick(OrderStatus.Cooking)}
+                className="py-2 px-3 bg-indigo-600 text-white font-semibold hover:bg-indigo-500 transition-colors"
+              >
                 주문 수락
               </button>
             )}
             {data?.getOrder.order?.status === OrderStatus.Cooking && (
-              <button onClick={() => onButtonClick(OrderStatus.Cooked)} className="py-2 px-3 bg-indigo-600 text-white font-semibold hover:bg-indigo-500 transition-colors">
+              <button
+                onClick={() => onButtonClick(OrderStatus.Cooked)}
+                className="py-2 px-3 bg-indigo-600 text-white font-semibold hover:bg-indigo-500 transition-colors"
+              >
                 조리완료 알람 보내기
+              </button>
+            )}
+          </>
+        )}
+        {userData?.me.role === "Delivery" && (
+          <>
+            {data?.getOrder.order?.status === OrderStatus.Cooked && (
+              <button
+                onClick={() => onButtonClick(OrderStatus.PickedUp)}
+                className="py-2 px-3 bg-indigo-600 text-white font-semibold hover:bg-indigo-500 transition-colors"
+              >
+                픽업 완료
+              </button>
+            )}
+            {data?.getOrder.order?.status === OrderStatus.PickedUp && (
+              <button
+                onClick={() => onButtonClick(OrderStatus.Delivered)}
+                className="py-2 px-3 bg-indigo-600 text-white font-semibold hover:bg-indigo-500 transition-colors"
+              >
+                배달 완료
               </button>
             )}
           </>
